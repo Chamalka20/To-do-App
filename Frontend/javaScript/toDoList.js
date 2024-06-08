@@ -41,7 +41,13 @@ function formatDate(dateString) {
 
 
 // Function to render tasks on the UI
-function renderTasks(tasks) {
+function renderTasks(tasks){
+     // Sort tasks by due date
+     tasks.sort((a, b) => {
+        if (a.dueDate && b.dueDate) {
+            return new Date(a.dueDate) - new Date(b.dueDate);
+        } 
+    });
     var tableBody = document.getElementById("taskList");
     tableBody.innerHTML = "";
     tasks.forEach(function(task, index) {
