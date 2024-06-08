@@ -5,28 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List Login</title>
     <link rel="stylesheet" href="../css/logIn.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <header>
         <h1>To-Do List Application</h1>
     </header>
     <div class="login-container">
-        <form id="login-form" class="login-form">
+        <div class="login-form">
             <h2>Login</h2>
             <div class="input-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="email" name="email" required>
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="button" id="login-btn">Login</button>
+            <button type="button" id="login-btn" onclick="login()">Login</button>
             <p id="error-msg" class="error-msg"></p>
-            <p>Not registered? <a href="#" id="signup-link">Sign up</a></p>
-        </form>
+            <p>Not registered? <a href="../html/signUp.html" id="signup-link">Sign up</a></p>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="../javaScript/logIn.js"></script>
 </body>
 </html>

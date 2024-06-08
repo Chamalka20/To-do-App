@@ -1,8 +1,10 @@
 const dbConnection = require('./dbConnection');
 
-//  get all tasks
-const getAllTasks = (callback) => {
-  dbConnection.query('SELECT * FROM tasks', (err, results) => {
+// Get all tasks for a specific user
+const getAllTasks = (userId, callback) => {
+  console.log(userId);
+  dbConnection.query('SELECT tasks.* FROM tasks JOIN usertasks ON tasks.taskId = usertasks.taskId WHERE usertasks.userId = ?',
+     [userId], (err, results) => {
     if (err) {
       callback(err, null);
       return;
@@ -11,9 +13,9 @@ const getAllTasks = (callback) => {
   });
 };
 
-//  get a task by ID
-const getTaskById = (id, callback) => {
-  dbConnection.query('SELECT * FROM tasks WHERE tasksId = ?', [id], (err, results) => {
+// Get a task by ID for a specific user
+const getTaskById = (userId, taskId, callback) => {
+  dbConnection.query('SELECT * FROM tasks INNER JOIN userTasks ON task.tasksId = userTasks.taskId WHERE userTasks.userId = ? AND tasks.tasksId = ?', [userId, taskId], (err, results) => {
     if (err) {
       callback(err, null);
       return;
@@ -22,20 +24,45 @@ const getTaskById = (id, callback) => {
   });
 };
 
-// create a new task
-const createTask = (task, callback) => {
-  dbConnection.query('INSERT INTO tasks SET ?', task, (err, results) => {
+// Create a new task for a specific user
+const createTask = (userId, task, callback) => {
+  dbConnection.beginTransaction((err) => {
     if (err) {
-      callback(err, null);
+      callback(err);
       return;
     }
-    callback(null, { id: results.insertId, ...task });
+    dbConnection.query('INSERT INTO tasks SET ?', task, (err, results) => {
+      if (err) {
+        dbConnection.rollback(() => {
+          callback(err);
+        });
+        return;
+      }
+      const taskId = results.insertId;
+      dbConnection.query('INSERT INTO userTasks SET ?', { userId, taskId }, (err) => {
+        if (err) {
+          dbConnection.rollback(() => {
+            callback(err);
+          });
+          return;
+        }
+        dbConnection.commit((err) => {
+          if (err) {
+            dbConnection.rollback(() => {
+              callback(err);
+            });
+            return;
+          }
+          callback(null, { id: taskId, ...task });
+        });
+      });
+    });
   });
 };
 
-// update a task by ID
+// Update a task by ID for a specific user
 const updateTask = (id, task, callback) => {
-  dbConnection.query('UPDATE tasks SET ? WHERE tasksId = ?', [task, id], (err, results) => {
+  dbConnection.query('UPDATE tasks SET ? WHERE taskId = ?', [task, id], (err, results) => {
     if (err) {
       callback(err, null);
       return;
@@ -44,16 +71,48 @@ const updateTask = (id, task, callback) => {
   });
 };
 
-// delete a task by ID
-const deleteTask = (id, callback) => {
-  dbConnection.query('DELETE FROM tasks WHERE tasksId = ?', [id], (err, results) => {
+// Delete a task by ID for a specific user
+const deleteTask = (taskId, userId, callback) => {
+  dbConnection.beginTransaction((err) => {
     if (err) {
-      callback(err, null);
+      callback(err);
       return;
     }
-    callback(null, results);
+
+    // First, delete from userTasks
+    dbConnection.query('DELETE FROM userTasks WHERE userId = ? AND taskId = ?', [userId, taskId], (err, results) => {
+      if (err) {
+        dbConnection.rollback(() => {
+          callback(err);
+        });
+        return;
+      }
+
+      // Then, delete from tasks
+      dbConnection.query('DELETE FROM tasks WHERE taskId = ?', [taskId], (err) => {
+        if (err) {
+          dbConnection.rollback(() => {
+            callback(err);
+          });
+          return;
+        }
+
+        // Commit the transaction
+        dbConnection.commit((err) => {
+          if (err) {
+            dbConnection.rollback(() => {
+              callback(err);
+            });
+            return;
+          }
+
+          callback(null, results); // You can adjust this to return whatever result is appropriate
+        });
+      });
+    });
   });
 };
+
 
 module.exports = {
   getAllTasks,

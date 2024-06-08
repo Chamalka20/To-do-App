@@ -35,8 +35,9 @@ router.post('/signIn', (req, res) => {
 });
 
 //  get all tasks
-router.get('/getAllTasks', (req, res) => {
-  tasks.getAllTasks((err, results) => {
+router.get('/getAllTasks/:userId', (req, res) => {
+  const userId = req.params.userId;
+  tasks.getAllTasks(userId,(err, results) => {
     if (err) {
       console.error('Error retrieving tasks:', err);
       res.status(500).send('Database query error');
@@ -65,8 +66,12 @@ router.get('/getTaskByID/:id', (req, res) => {
 
 // create a new task
 router.post('/addNewTask', (req, res) => {
-  const newTask = req.body;
-  tasks.createTask(newTask, (err, task) => {
+  const { userId, task } = req.body; 
+  if (!userId || !task) {
+    res.status(400).send('User ID and description are required');
+    return;
+  }
+  tasks.createTask(userId, task,(err, task) => {
     if (err) {
       console.error('Error creating task:', err);
       res.status(500).send('Database query error');
@@ -96,8 +101,13 @@ router.put('/updateTask/:id', (req, res) => {
 
 // delete a task by ID
 router.delete('/deleteTask/:id', (req, res) => {
+  const {userId} = req.body; 
   const taskId = req.params.id;
-  tasks.deleteTask(taskId, (err, result) => {
+  if (!userId) {
+    res.status(400).send('User ID is required');
+    return;
+  }
+  tasks.deleteTask(taskId, userId, (err, result) => {
     if (err) {
       console.error('Error deleting task:', err);
       res.status(500).send('Database query error');
