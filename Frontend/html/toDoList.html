@@ -5,18 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List</title>
     <link rel="stylesheet" href="../css/toDoList.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>To-Do List</h1>
         <div class="add-task">
             <input type="text" id="taskInput" placeholder="Enter task">
-            <div class="add-button" onclick="addTask()">Add Task</div>
+            <input type="date" id="dueDateInput">
+            <button onclick="addTask()">Add Task</button>
         </div>
         <table class="todo-table">
             <thead>
                 <tr>
                     <th>Task</th>
+                    <th>Due Date</th>
                     <th>Action</th>
                 </tr>
             </thead>

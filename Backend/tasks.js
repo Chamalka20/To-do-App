@@ -2,7 +2,7 @@ const dbConnection = require('./dbConnection');
 
 //  get all tasks
 const getAllTasks = (callback) => {
-  dbConnection.query('SELECT * FROM task', (err, results) => {
+  dbConnection.query('SELECT * FROM tasks', (err, results) => {
     if (err) {
       callback(err, null);
       return;
