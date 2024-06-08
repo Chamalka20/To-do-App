@@ -1,6 +1,38 @@
 const express = require('express');
 const router = express.Router();
 const tasks = require('./tasks');
+const users = require('./users');
+
+// Signup 
+router.post('/signup', (req, res) => {
+  const { userName, email, password } = req.body;
+
+  users.signup({ userName, email, password }, (err, user) => {
+    if (err) {
+      res.status(500).send('Error signing up');
+      return;
+    }
+    res.status(201).send(user);
+  });
+});
+// Sign-in 
+router.post('/signIn', (req, res) => {
+  const { email, password } = req.body;
+
+  users.signIn(email, password, (err, user) => {
+    if (err) {
+      res.status(500).send('Error signing in');
+      return;
+    }
+
+    if (!user) {
+      res.status(401).send('Invalid email or password');
+      return;
+    }
+
+    res.status(200).send(user);
+  });
+});
 
 //  get all tasks
 router.get('/getAllTasks', (req, res) => {
