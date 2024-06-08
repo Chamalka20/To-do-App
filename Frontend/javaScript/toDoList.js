@@ -1,7 +1,7 @@
 // Base URL for API requests
 const url = 'http://localhost:3000';
 var userId;
-
+var filterTasksData;
 function checkedUserAuthenticated (){
     var id = localStorage.getItem('userId');
     if(id !== null){
@@ -38,7 +38,16 @@ function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString(undefined, options);
 }
-
+//filter by date
+function filterTasks() {
+    var filterDate = new Date(document.getElementById("filterDate").value);
+    var filteredTasks =  filterTasksData.filter(function(task) {
+        var taskDueDate = new Date(task.dueDate);
+        // Check if task due date matches the filter date
+        return taskDueDate.toDateString() === filterDate.toDateString();
+    });
+    renderTasks(filteredTasks);
+}
 
 // Function to render tasks on the UI
 function renderTasks(tasks){
@@ -50,6 +59,7 @@ function renderTasks(tasks){
     });
     var tableBody = document.getElementById("taskList");
     tableBody.innerHTML = "";
+    filterTasksData= tasks;
     tasks.forEach(function(task, index) {
         var tr = document.createElement("tr");
         var tdTask = document.createElement("td");

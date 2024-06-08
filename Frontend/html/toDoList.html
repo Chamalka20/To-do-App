@@ -18,10 +18,17 @@
 
     <div class="container">
         <h1>To-Do List</h1>
+        <!-- Filter section -->
+        
         <div class="add-task">
             <input type="text" id="taskInput" placeholder="Enter task">
             <input type="date" id="dueDateInput">
             <button onclick="addTask()">Add Task</button>
+        </div>
+        <div class="filter-section">
+            <label for="filterDate">Filter by Date:</label>
+            <input type="date" id="filterDate">
+            <button onclick="filterTasks()">Filter</button>
         </div>
         <table class="todo-table">
             <thead>

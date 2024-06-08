@@ -51,6 +51,10 @@ h1 {
     color: #343a40;
 }
 
+.filter-section button{
+    background-color: #000000;
+}
+
 .add-task {
     display: flex;
     justify-content: space-between;
